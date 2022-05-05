@@ -6,7 +6,8 @@ import term
 
 fn get_magic(mimetypes json.Any, search string)([]string, string){
 	mime := mimetypes.as_map()[search] or {
-		println("failed to find extension!")
+		println(term.bold(term.red("Failed to find extension.")))
+		println(term.magenta("Use 'help list' for more information on filetypes"))
 		exit(1)
 	}.as_map()
 	signs := mime["signs"] or {
@@ -80,22 +81,19 @@ ${term.gray("Thanks to qti3e on github for the mimetype json data!")}"
 
 	if os.args.len != 4 {
 		println("Usage: ${os.base(os.args[0])} <extension> <MBs size> <output file>")
-		println(term.magenta("Type help for more information!"))
+		println(term.magenta("Type 'help' for more information!"))
 		exit(1)
 	}
 
-	search := "pdf"
-
-	mbs := 8
+	search := os.args[1]
+	mbs := os.args[2].int()
 
 	length := mbs * 1024 * 1024
 
 	mut file := []u8{cap: length, len: length}
 	for i in 0..length {file[i] = rand.u8()}
 
-	signs, _ := get_magic(mimetypes, search)
-	// mimestr
-	//println(mimestr+"\n")
+	signs, mimetype := get_magic(mimetypes, search)
 
 	mut pointer := 0
 	for sign in signs{
@@ -111,4 +109,5 @@ ${term.gray("Thanks to qti3e on github for the mimetype json data!")}"
 		println("failed to write file")
 		exit(1)
 	}
+	println(term.green("Created file ${os.args[3]} with mimetype $mimetype!"))
 }
